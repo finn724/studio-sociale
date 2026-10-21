@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Studio Socialé
 
-## Getting Started
+Marketing site for **Studio Socialé**, a social media management, content and
+strategy agency. Built with Next.js (App Router), TypeScript, Tailwind CSS,
+Framer Motion, GSAP/ScrollTrigger and Lenis.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router, TypeScript)
+- **Tailwind CSS v4** for styling and design tokens
+- **Framer Motion** for component animation (reveals, hover states, the
+  custom cursor, the hero's 3D phone tilt)
+- **GSAP + ScrollTrigger** for scroll-scrubbed effects (the word-by-word
+  statement reveal, the process timeline draw) and the velocity-aware marquee
+- **Lenis** for smooth scrolling
+- **Resend** for emailing contact form inquiries
+- **Zod** for form validation (shared between the client and the API route)
+
+All looping/scroll-driven motion respects `prefers-reduced-motion` and is
+disabled in favor of static content when it's set.
+
+## Getting started
+
+Requires Node.js 20.19+ (or 22.13+).
 
 ```bash
+npm install
+cp .env.example .env.local   # then fill in your Resend details
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> **Note on `next dev` and Turbopack:** this project uses Turbopack (the
+> Next.js default) for `dev`/`build`. If you're developing inside a sandboxed
+> environment that blocks spawning child Node processes, Turbopack's CSS
+> loader worker can fail to start. If that happens, run
+> `next dev --webpack` / `next build --webpack` instead — a
+> `postcss.config.mjs` using `@tailwindcss/postcss` is included specifically
+> as a webpack-mode fallback. A normal local machine or CI/Vercel build does
+> not need this.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contact form / email setup
 
-## Learn More
+The contact form posts to `src/app/api/contact/route.ts`, which validates the
+payload with the shared schema in `src/lib/contact-schema.ts` and sends an
+email via [Resend](https://resend.com).
 
-To learn more about Next.js, take a look at the following resources:
+Environment variables (see `.env.example`):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Variable | Required | Description |
+| --- | --- | --- |
+| `RESEND_API_KEY` | Yes | API key from your Resend dashboard. |
+| `CONTACT_TO_EMAIL` | Yes | Inbox that should receive inquiries. |
+| `CONTACT_FROM_EMAIL` | No | Sender address, e.g. `"Studio Socialé <inquiries@yourdomain.com>"`. Must be on a domain verified in Resend. Defaults to Resend's shared test sender (`onboarding@resend.dev`), which works immediately but is best for testing only — verify your own domain in Resend before going live. |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+If the env vars aren't set, the API route returns a friendly error instead of
+throwing, and the form surfaces it inline.
 
-## Deploy on Vercel
+## Project structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/
+    page.tsx              # assembles all sections
+    layout.tsx             # fonts, metadata, smooth scroll + cursor providers
+    globals.css             # design tokens (colors, radii, easing, shimmer/glass utilities)
+    api/contact/route.ts    # POST handler, emails via Resend
+    icon.tsx / apple-icon.tsx / opengraph-image.tsx   # generated brand imagery
+  components/               # one component per section, plus shared bits
+    (Nav, Hero, Marquee, Statement, Services, StatementPanel,
+     Process, Contact, ContactForm, Footer, BlobField, FadeIn,
+     CustomCursor, SmoothScroll, PhoneMockup, ServiceIcons)
+  lib/
+    motion.ts               # shared easing curve + Framer Motion variants
+    contact-schema.ts        # Zod schema shared by the form and the API route
+assets/fonts/                # font files bundled for the generated OG/icon images
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Content still to fill in
+
+Everything in the spec is implemented with real copy, but a few things are
+placeholders you'll want to replace before shipping:
+
+- **Open Graph / social preview URL**: `metadataBase` in `src/app/layout.tsx`
+  points at `https://studiosociale.example` — update it to the real domain
+  once you have one, so shared links resolve correctly.
+- **Sender email domain**: see `CONTACT_FROM_EMAIL` above — verify a real
+  domain in Resend for production sends.
+- **Social handles / links**: Instagram and TikTok links are wired to the
+  real handles given in the brief (`@studiosocialeofficial`,
+  `@studio.sociale`); double-check they're still correct before launch.
+- No pricing, testimonials or case studies were specified, so none are
+  included — add sections for those if/when you have real content.
+
+## Deploying to Vercel
+
+1. Push this project to a Git repository.
+2. Import it in Vercel.
+3. Add the environment variables above (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
+   optionally `CONTACT_FROM_EMAIL`) in the Vercel project settings.
+4. Deploy — no other configuration is required.
+
+## Scripts
+
+```bash
+npm run dev     # start the dev server
+npm run build   # production build
+npm run start   # run the production build locally
+npm run lint    # eslint
+```
