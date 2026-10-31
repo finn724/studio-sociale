@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE } from "@/lib/motion";
 
 const links = [
-  { href: "#services", label: "Services" },
-  { href: "#process", label: "Process" },
+  { href: "/#services", label: "Services" },
+  { href: "/#process", label: "Process" },
 ];
 
 function Monogram() {
@@ -60,8 +61,8 @@ export default function Nav() {
             : "0 6px 24px rgba(15,17,21,0.06)",
         }}
       >
-        <a
-          href="#top"
+        <Link
+          href="/"
           className="flex items-center gap-2.5"
           aria-label="Studio Socialé home"
         >
@@ -69,25 +70,25 @@ export default function Nav() {
           <span className="hidden text-[11px] font-semibold tracking-[0.18em] text-ink sm:inline">
             STUDIO SOCIALÉ
           </span>
-        </a>
+        </Link>
 
         <div className="hidden items-center gap-1 md:flex">
           {links.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="rounded-full px-4 py-2 text-sm text-ink/80 transition-colors hover:text-ink"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
-          <a
-            href="#contact"
+          <Link
+            href="/#contact"
             className="ml-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-bone transition-transform hover:scale-[1.03]"
             style={{ transitionTimingFunction: "cubic-bezier(.16,1,.3,1)" }}
           >
             Book a call
-          </a>
+          </Link>
         </div>
 
         <button
@@ -127,22 +128,22 @@ export default function Nav() {
             className="glass fixed inset-x-4 top-[76px] z-[99] flex flex-col gap-1 rounded-[28px] p-4 md:hidden"
           >
             {links.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
                 className="rounded-2xl px-4 py-3 text-base text-ink/80"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
-            <a
-              href="#contact"
+            <Link
+              href="/#contact"
               onClick={closeMenu}
               className="mt-1 rounded-2xl bg-ink px-4 py-3 text-center text-base font-medium text-bone"
             >
               Book a call
-            </a>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
