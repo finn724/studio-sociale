@@ -6,14 +6,16 @@ import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } fro
 const posts = Array.from({ length: 8 }, (_, i) => i);
 
 function PostTile({ index }: { index: number }) {
-  const palette = ["var(--mist)", "var(--lilac)", "var(--champagne)"];
   return (
-    <div
-      className="aspect-square rounded-lg"
-      style={{
-        background: `linear-gradient(145deg, ${palette[index % 3]}33, ${palette[(index + 1) % 3]}22)`,
-      }}
-    />
+    <div className="aspect-square overflow-hidden rounded-lg bg-midnight/40">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`/feed/post-${index + 1}.jpg`}
+        alt=""
+        loading="lazy"
+        className="h-full w-full object-cover"
+      />
+    </div>
   );
 }
 
