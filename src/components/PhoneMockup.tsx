@@ -73,9 +73,13 @@ export default function PhoneMockup() {
                   <span>S</span>
                 </span>
               </div>
-              <div className="flex flex-1 flex-col gap-1.5">
-                <div className="h-2.5 w-24 rounded-full bg-bone/80" />
-                <div className="h-2 w-16 rounded-full bg-bone/30" />
+              <div className="flex flex-1 flex-col gap-0.5">
+                <span className="font-display text-base leading-tight text-bone">
+                  Studio Socialé
+                </span>
+                <span className="text-[11px] text-bone/40">
+                  @studiosocialeofficial
+                </span>
               </div>
             </div>
             <div className="flex justify-between text-center">
