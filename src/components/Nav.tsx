@@ -8,6 +8,7 @@ import { EASE } from "@/lib/motion";
 const links = [
   { href: "/#services", label: "Services" },
   { href: "/#process", label: "Process" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 function Monogram() {
