@@ -64,12 +64,18 @@ export default function PhoneMockup() {
           <div className="flex flex-col gap-3 p-4">
             <div className="flex items-center gap-3">
               <div
-                className="h-12 w-12 shrink-0 rounded-full"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
                 style={{
                   background:
                     "conic-gradient(from 90deg, var(--mist), var(--lilac), var(--champagne), var(--mist))",
                 }}
-              />
+              >
+                <span className="flex items-center gap-[1.5px] font-serif text-[13px] leading-none text-midnight">
+                  <span>S</span>
+                  <span className="mx-px h-[9px] w-px bg-midnight/60" />
+                  <span>S</span>
+                </span>
+              </div>
               <div className="flex flex-1 flex-col gap-1.5">
                 <div className="h-2.5 w-24 rounded-full bg-bone/80" />
                 <div className="h-2 w-16 rounded-full bg-bone/30" />
