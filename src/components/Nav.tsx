@@ -77,9 +77,17 @@ export default function Nav() {
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-full px-4 py-2 text-sm text-ink/80 transition-colors hover:text-ink"
+              className="group relative rounded-full px-4 py-2 text-sm"
             >
-              {link.label}
+              <span
+                className="absolute inset-0 rounded-full bg-mist/0 transition-all duration-300 group-hover:bg-mist/25"
+                style={{
+                  transitionTimingFunction: "cubic-bezier(.16,1,.3,1)",
+                }}
+              />
+              <span className="relative text-ink/80 transition-colors duration-300 group-hover:text-ink">
+                {link.label}
+              </span>
             </Link>
           ))}
           <Link
@@ -132,7 +140,7 @@ export default function Nav() {
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
-                className="rounded-2xl px-4 py-3 text-base text-ink/80"
+                className="rounded-2xl px-4 py-3 text-base text-ink/80 transition-colors duration-200 active:bg-mist/25 active:text-ink"
               >
                 {link.label}
               </Link>
