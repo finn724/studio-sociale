@@ -14,6 +14,7 @@ const services = [
       "We run your accounts day to day so they stay active, on brand and on time.",
     pills: ["Content calendar", "Comments and DMs", "Monthly recap"],
     Icon: CalendarIcon,
+    image: "/feed/collage-1.jpg",
   },
   {
     id: "content",
@@ -22,6 +23,7 @@ const services = [
       "Reels, TikToks, carousels and stories made to look and sound like your brand.",
     pills: ["Short-form video", "Carousel design", "Captions in your voice"],
     Icon: PlayIcon,
+    image: "/feed/collage-3.jpg",
   },
   {
     id: "strategy",
@@ -30,6 +32,7 @@ const services = [
       "A clear plan for what to post, where to post it and why.",
     pills: ["Account audit", "Content pillars", "Growth plan"],
     Icon: GrowthIcon,
+    image: "/feed/collage-2.jpg",
   },
 ];
 
@@ -72,46 +75,71 @@ export default function Services() {
                   transition: "background 0.8s cubic-bezier(.16,1,.3,1), color 0.8s cubic-bezier(.16,1,.3,1)",
                 }}
               >
-                <div className="flex items-start justify-between">
-                  <span
-                    style={{ color: isActive ? "var(--mist)" : "currentColor" }}
-                  >
-                    <service.Icon active={isActive} />
-                  </span>
-                  <span className="font-display text-2xl opacity-40">
-                    0{i + 1}
-                  </span>
+                <div className="absolute inset-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={service.image}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                    style={{
+                      opacity: isActive ? 0.55 : 0.2,
+                      transition: "opacity 0.8s cubic-bezier(.16,1,.3,1)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: isActive
+                        ? "linear-gradient(185deg, rgba(15,17,21,0.1) 0%, rgba(15,17,21,0.55) 45%, rgba(15,17,21,0.97) 100%)"
+                        : "linear-gradient(185deg, rgba(226,222,215,0.35) 0%, rgba(226,222,215,0.8) 55%, rgba(226,222,215,0.98) 100%)",
+                      transition: "background 0.8s cubic-bezier(.16,1,.3,1)",
+                    }}
+                  />
                 </div>
 
-                <h3 className="font-display mt-10 text-3xl sm:text-4xl">
-                  {service.title}
-                </h3>
-
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 12 }}
-                      transition={{ duration: 0.5, ease: EASE }}
-                      className="mt-6 flex flex-1 flex-col justify-between"
+                <div className="relative z-10 flex h-full flex-col">
+                  <div className="flex items-start justify-between">
+                    <span
+                      style={{ color: isActive ? "var(--mist)" : "currentColor" }}
                     >
-                      <p className="max-w-xs text-sm leading-relaxed text-bone/70">
-                        {service.summary}
-                      </p>
-                      <div className="mt-8 flex flex-wrap gap-2">
-                        {service.pills.map((pill) => (
-                          <span
-                            key={pill}
-                            className="rounded-full border border-bone/20 px-3 py-1.5 text-xs text-bone/80"
-                          >
-                            {pill}
-                          </span>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                      <service.Icon active={isActive} />
+                    </span>
+                    <span className="font-display text-2xl opacity-40">
+                      0{i + 1}
+                    </span>
+                  </div>
+
+                  <h3 className="font-display mt-10 text-3xl sm:text-4xl">
+                    {service.title}
+                  </h3>
+
+                  <AnimatePresence>
+                    {isActive && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 12 }}
+                        transition={{ duration: 0.5, ease: EASE }}
+                        className="mt-6 flex flex-1 flex-col justify-between"
+                      >
+                        <p className="max-w-xs text-sm leading-relaxed text-bone/70">
+                          {service.summary}
+                        </p>
+                        <div className="mt-8 flex flex-wrap gap-2">
+                          {service.pills.map((pill) => (
+                            <span
+                              key={pill}
+                              className="rounded-full border border-bone/20 px-3 py-1.5 text-xs text-bone/80"
+                            >
+                              {pill}
+                            </span>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </motion.button>
             );
           })}
@@ -136,7 +164,25 @@ export default function Services() {
                   aria-expanded={isOpen}
                 >
                   <span className="flex items-center gap-4">
-                    <service.Icon active={isOpen} />
+                    <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={service.image}
+                        alt=""
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                      <span
+                        className="absolute inset-0 flex items-center justify-center"
+                        style={{
+                          background: isOpen
+                            ? "rgba(15,17,21,0.5)"
+                            : "rgba(226,222,215,0.65)",
+                        }}
+                      >
+                        <service.Icon active={isOpen} />
+                      </span>
+                    </span>
                     <span className="font-display text-2xl">
                       {service.title}
                     </span>

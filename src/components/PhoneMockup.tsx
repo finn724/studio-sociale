@@ -65,10 +65,7 @@ export default function PhoneMockup() {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
-                style={{
-                  background:
-                    "conic-gradient(from 90deg, var(--mist), var(--lilac), var(--champagne), var(--mist))",
-                }}
+                style={{ background: "var(--bone)" }}
               >
                 <span className="flex items-center gap-[1.5px] font-serif text-[13px] leading-none text-midnight">
                   <span>S</span>
