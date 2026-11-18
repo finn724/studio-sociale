@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE } from "@/lib/motion";
-import FadeIn from "./FadeIn";
+import LiquidGlass from "./LiquidGlass";
+import SplitChars from "./SplitChars";
 import { CalendarIcon, GrowthIcon, PlayIcon } from "./ServiceIcons";
 
 const services = [
@@ -28,34 +29,102 @@ const services = [
   {
     id: "strategy",
     title: "Strategy",
-    summary:
-      "A clear plan for what to post, where to post it and why.",
+    summary: "A clear plan for what to post, where to post it and why.",
     pills: ["Account audit", "Content pillars", "Growth plan"],
     Icon: GrowthIcon,
     image: "/feed/collage-2.jpg",
   },
 ];
 
+type Service = (typeof services)[number];
+
+function Details({ service }: { service: Service }) {
+  return (
+    <>
+      <h3 className="font-display text-4xl">{service.title}</h3>
+      <p className="mt-3 max-w-sm text-sm leading-relaxed text-bone/80">{service.summary}</p>
+      <div className="mt-5 flex flex-wrap gap-2">
+        {service.pills.map((pill) => (
+          <span
+            key={pill}
+            className="rounded-full border border-bone/25 bg-bone/10 px-3 py-1.5 text-xs text-bone/90"
+          >
+            {pill}
+          </span>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function CardChrome({ service, index, active }: { service: Service; index: number; active: boolean }) {
+  return (
+    <div className="flex items-start justify-between">
+      <LiquidGlass
+        radius={999}
+        bezel={12}
+        strength={26}
+        sheen={false}
+        className="flex h-16 w-16 items-center justify-center text-bone [&_svg]:h-9 [&_svg]:w-9"
+      >
+        <service.Icon active={active} />
+      </LiquidGlass>
+      <LiquidGlass
+        radius={999}
+        refract={false}
+        sheen={false}
+        className="px-3 py-1.5 font-display text-lg text-bone/90"
+      >
+        0{index + 1}
+      </LiquidGlass>
+    </div>
+  );
+}
+
+function Photo({ src, active }: { src: string; active: boolean }) {
+  return (
+    <>
+      <motion.img
+        src={src}
+        alt=""
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover"
+        animate={{ scale: active ? 1.02 : 1.14, filter: active ? "saturate(1.05)" : "saturate(0.7)" }}
+        transition={{ duration: 1.4, ease: EASE }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(15,17,21,0.35) 0%, rgba(15,17,21,0.05) 35%, rgba(15,17,21,0.15) 60%, rgba(15,17,21,0.75) 100%)",
+        }}
+      />
+    </>
+  );
+}
+
 export default function Services() {
-  const [active, setActive] = useState<number | null>(null);
-  const [openMobile, setOpenMobile] = useState<number | null>(0);
+  const [active, setActive] = useState(0);
 
   return (
-    <section id="services" className="bg-bone px-6 py-28 sm:px-10 sm:py-36">
+    <section id="services" data-nav-theme="light" className="bg-bone px-6 py-28 sm:px-10 sm:py-36">
       <div className="mx-auto max-w-[1400px]">
-        <FadeIn className="mb-16 max-w-xl">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-light">
-            What we do
+        <div className="mb-16 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div className="max-w-2xl">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-light">
+              What we do
+            </p>
+            <h2 className="font-display text-[12vw] sm:text-[56px] md:text-[68px]">
+              <SplitChars text="Three ways we keep your feed alive." inView stagger={0.014} />
+            </h2>
+          </div>
+          <p className="max-w-xs text-sm leading-relaxed text-muted-light">
+            Pick one, or hand us all three. Hover a card to see what&apos;s inside.
           </p>
-          <h2 className="font-display text-[12vw] sm:text-[56px] md:text-[64px]">
-            Three ways we keep your feed alive.
-          </h2>
-        </FadeIn>
+        </div>
 
-        <FadeIn
-          className="hidden h-[560px] gap-4 md:flex"
-          delay={0.1}
-        >
+        <div className="hidden h-[620px] gap-4 md:flex">
           {services.map((service, i) => {
             const isActive = active === i;
             return (
@@ -63,167 +132,88 @@ export default function Services() {
                 key={service.id}
                 type="button"
                 onMouseEnter={() => setActive(i)}
-                onMouseLeave={() => setActive(null)}
                 onFocus={() => setActive(i)}
-                onBlur={() => setActive(null)}
-                animate={{ flexGrow: isActive ? 2.4 : 1 }}
-                transition={{ duration: 0.8, ease: EASE }}
-                className="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-panel p-8 text-left"
-                style={{
-                  background: isActive ? "var(--midnight)" : "var(--stone)",
-                  color: isActive ? "var(--bone)" : "var(--ink)",
-                  transition: "background 0.8s cubic-bezier(.16,1,.3,1), color 0.8s cubic-bezier(.16,1,.3,1)",
+                aria-pressed={isActive}
+                initial={{ clipPath: "inset(100% 0% 0% 0% round 36px)" }}
+                whileInView={{ clipPath: "inset(0% 0% 0% 0% round 36px)" }}
+                viewport={{ once: true, margin: "-10% 0px" }}
+                animate={{ flexGrow: isActive ? 2.6 : 1 }}
+                transition={{
+                  flexGrow: { duration: 0.9, ease: EASE },
+                  clipPath: { duration: 1.3, ease: EASE, delay: i * 0.12 },
                 }}
+                className="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-[36px] p-6 text-left text-bone"
               >
-                <div className="absolute inset-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={service.image}
-                    alt=""
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                    style={{
-                      opacity: isActive ? 0.55 : 0.2,
-                      transition: "opacity 0.8s cubic-bezier(.16,1,.3,1)",
-                    }}
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background: isActive
-                        ? "linear-gradient(185deg, rgba(15,17,21,0.1) 0%, rgba(15,17,21,0.55) 45%, rgba(15,17,21,0.97) 100%)"
-                        : "linear-gradient(185deg, rgba(226,222,215,0.35) 0%, rgba(226,222,215,0.8) 55%, rgba(226,222,215,0.98) 100%)",
-                      transition: "background 0.8s cubic-bezier(.16,1,.3,1)",
-                    }}
-                  />
-                </div>
+                <Photo src={service.image} active={isActive} />
 
-                <div className="relative z-10 flex h-full flex-col">
-                  <div className="flex items-start justify-between">
-                    <span
-                      style={{ color: isActive ? "var(--mist)" : "currentColor" }}
-                    >
-                      <service.Icon active={isActive} />
-                    </span>
-                    <span className="font-display text-2xl opacity-40">
-                      0{i + 1}
-                    </span>
+                <div className="relative flex h-full flex-col">
+                  <CardChrome service={service} index={i} active={isActive} />
+
+                  <div className="mt-auto">
+                    <AnimatePresence mode="wait" initial={false}>
+                      {isActive ? (
+                        <motion.div
+                          key="panel"
+                          initial={{ opacity: 0, y: 40 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 24 }}
+                          transition={{ duration: 0.7, ease: EASE }}
+                        >
+                          <LiquidGlass
+                            radius={26}
+                            bezel={20}
+                            strength={52}
+                            blur={6}
+                            tint="rgba(15,17,21,0.18)"
+                            className="p-6"
+                          >
+                            <Details service={service} />
+                          </LiquidGlass>
+                        </motion.div>
+                      ) : (
+                        <motion.h3
+                          key="title"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 12 }}
+                          transition={{ duration: 0.5, ease: EASE }}
+                          className="font-display text-4xl"
+                        >
+                          {service.title}
+                        </motion.h3>
+                      )}
+                    </AnimatePresence>
                   </div>
-
-                  <h3 className="font-display mt-10 text-3xl sm:text-4xl">
-                    {service.title}
-                  </h3>
-
-                  <AnimatePresence>
-                    {isActive && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 12 }}
-                        transition={{ duration: 0.5, ease: EASE }}
-                        className="mt-6 flex flex-1 flex-col justify-between"
-                      >
-                        <p className="max-w-xs text-sm leading-relaxed text-bone/70">
-                          {service.summary}
-                        </p>
-                        <div className="mt-8 flex flex-wrap gap-2">
-                          {service.pills.map((pill) => (
-                            <span
-                              key={pill}
-                              className="rounded-full border border-bone/20 px-3 py-1.5 text-xs text-bone/80"
-                            >
-                              {pill}
-                            </span>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               </motion.button>
             );
           })}
-        </FadeIn>
+        </div>
 
-        <div className="flex flex-col gap-3 md:hidden">
-          {services.map((service, i) => {
-            const isOpen = openMobile === i;
-            return (
-              <div
-                key={service.id}
-                className="overflow-hidden rounded-panel"
-                style={{
-                  background: isOpen ? "var(--midnight)" : "var(--stone)",
-                  color: isOpen ? "var(--bone)" : "var(--ink)",
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenMobile(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between gap-4 p-6 text-left"
-                  aria-expanded={isOpen}
+        <div className="flex flex-col gap-4 md:hidden">
+          {services.map((service, i) => (
+            <motion.article
+              key={service.id}
+              initial={{ clipPath: "inset(100% 0% 0% 0% round 30px)" }}
+              whileInView={{ clipPath: "inset(0% 0% 0% 0% round 30px)" }}
+              viewport={{ once: true, margin: "-10% 0px" }}
+              transition={{ duration: 1.2, ease: EASE }}
+              className="relative flex min-h-[460px] flex-col overflow-hidden rounded-[30px] p-5 text-bone"
+            >
+              <Photo src={service.image} active />
+              <div className="relative flex flex-1 flex-col">
+                <CardChrome service={service} index={i} active />
+                <LiquidGlass
+                  radius={22}
+                  refract={false}
+                  tint="rgba(15,17,21,0.28)"
+                  className="mt-auto p-5"
                 >
-                  <span className="flex items-center gap-4">
-                    <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={service.image}
-                        alt=""
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
-                      <span
-                        className="absolute inset-0 flex items-center justify-center"
-                        style={{
-                          background: isOpen
-                            ? "rgba(15,17,21,0.5)"
-                            : "rgba(226,222,215,0.65)",
-                        }}
-                      >
-                        <service.Icon active={isOpen} />
-                      </span>
-                    </span>
-                    <span className="font-display text-2xl">
-                      {service.title}
-                    </span>
-                  </span>
-                  <motion.span
-                    animate={{ rotate: isOpen ? 45 : 0 }}
-                    transition={{ duration: 0.4, ease: EASE }}
-                    className="text-xl"
-                  >
-                    +
-                  </motion.span>
-                </button>
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.5, ease: EASE }}
-                    >
-                      <div className="px-6 pb-6">
-                        <p className="text-sm leading-relaxed text-bone/70">
-                          {service.summary}
-                        </p>
-                        <div className="mt-6 flex flex-wrap gap-2">
-                          {service.pills.map((pill) => (
-                            <span
-                              key={pill}
-                              className="rounded-full border border-bone/20 px-3 py-1.5 text-xs text-bone/80"
-                            >
-                              {pill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                  <Details service={service} />
+                </LiquidGlass>
               </div>
-            );
-          })}
+            </motion.article>
+          ))}
         </div>
       </div>
     </section>

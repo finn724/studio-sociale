@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE } from "@/lib/motion";
 import { useCookieConsent } from "@/lib/cookie-consent";
+import LiquidGlass from "./LiquidGlass";
 
 export default function CookieBanner() {
   const { choice, setChoice } = useCookieConsent();
@@ -19,8 +20,15 @@ export default function CookieBanner() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.8, ease: EASE }}
-          className="glass fixed inset-x-4 bottom-4 z-[150] mx-auto flex max-w-xl flex-col gap-4 rounded-panel p-6 sm:flex-row sm:items-center sm:justify-between"
+          className="fixed inset-x-4 bottom-4 z-[150] mx-auto max-w-xl"
         >
+          <LiquidGlass
+            radius={28}
+            tone="light"
+            refract={false}
+            tint="rgba(239,236,230,0.78)"
+            className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"
+          >
           <p className="text-sm leading-relaxed text-ink/80">
             We use essential cookies to run this site, and would like your
             permission for analytics cookies to understand how it&apos;s
@@ -47,6 +55,7 @@ export default function CookieBanner() {
               Accept all
             </button>
           </div>
+          </LiquidGlass>
         </motion.div>
       )}
     </AnimatePresence>

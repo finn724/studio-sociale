@@ -13,7 +13,7 @@ export default function PricingPage() {
   return (
     <>
       <Nav />
-      <main className="pt-20 sm:pt-24">
+      <main>
         <Pricing />
         <Contact />
       </main>

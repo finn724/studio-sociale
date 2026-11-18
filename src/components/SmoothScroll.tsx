@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { isIntroDone, subscribeIntro } from "@/lib/intro";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,14 +30,26 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 
     lenis.on("scroll", ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
+    const tick = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
     window.__lenis = lenis;
 
+    let unsubscribe = () => {};
+    if (!isIntroDone()) {
+      lenis.stop();
+      unsubscribe = subscribeIntro(() => lenis.start());
+    }
+
+    const refresh = () => ScrollTrigger.refresh();
+    document.fonts?.ready.then(refresh);
+    window.addEventListener("load", refresh);
+
     return () => {
+      unsubscribe();
+      gsap.ticker.remove(tick);
+      window.removeEventListener("load", refresh);
       lenis.destroy();
       lenisRef.current = null;
       window.__lenis = undefined;

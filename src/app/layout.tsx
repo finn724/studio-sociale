@@ -4,7 +4,9 @@ import { MotionConfig } from "framer-motion";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import CookieBanner from "@/components/CookieBanner";
+import Preloader from "@/components/Preloader";
 import { CookieConsentProvider } from "@/lib/cookie-consent";
+import { introSkipScript } from "@/lib/intro-script";
 
 const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
@@ -52,14 +54,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${instrumentSerif.variable} ${manrope.variable} h-full`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: introSkipScript }} />
+      </head>
       <body className="min-h-full bg-bone text-ink antialiased">
         <MotionConfig reducedMotion="user">
           <CookieConsentProvider>
+            <Preloader />
             <SmoothScroll>{children}</SmoothScroll>
             <CookieBanner />
           </CookieConsentProvider>
         </MotionConfig>
+        <div aria-hidden className="grain" />
       </body>
     </html>
   );

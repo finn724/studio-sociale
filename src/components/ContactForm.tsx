@@ -82,7 +82,7 @@ export default function ContactForm() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: EASE }}
-        className="glass flex min-h-[420px] flex-col items-center justify-center rounded-panel p-10 text-center"
+        className="flex min-h-[420px] flex-col items-center justify-center p-10 text-center"
       >
         <motion.div
           initial={{ scale: 0.6, opacity: 0 }}
@@ -113,7 +113,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass flex flex-col gap-5 rounded-panel p-8">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5 p-7 sm:p-9">
       <input
         type="text"
         name="company"

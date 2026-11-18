@@ -13,7 +13,7 @@ export default function LegalPageShell({
   return (
     <>
       <Nav />
-      <main className="bg-bone px-6 pb-28 pt-44 sm:px-10 sm:pt-48">
+      <main data-nav-theme="light" className="bg-bone px-6 pb-28 pt-44 sm:px-10 sm:pt-48">
         <div className="mx-auto max-w-[760px]">
           <h1 className="font-display text-[14vw] sm:text-[64px]">{title}</h1>
           <p className="mt-3 text-sm text-muted-light">Last updated: {updated}</p>

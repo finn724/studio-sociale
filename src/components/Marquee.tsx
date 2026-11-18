@@ -3,28 +3,30 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 
-const words = [
-  { text: "Management", outline: false },
-  { text: "Reels", outline: true },
-  { text: "TikToks", outline: false },
-  { text: "Carousels", outline: true },
-  { text: "Captions", outline: false },
-  { text: "Strategy", outline: true },
-  { text: "Community", outline: false },
-  { text: "✦", outline: false },
-];
+const primary = ["Management", "Reels", "TikToks", "Carousels", "Captions", "Strategy", "Community"];
+const secondary = ["Content calendars", "Shoots", "Editing", "Growth plans", "Comments & DMs", "Monthly recaps"];
 
-function Track() {
+function Track({ words, variant }: { words: string[]; variant: "a" | "b" }) {
   return (
-    <div className="flex shrink-0 items-center gap-10 pr-10">
+    <div className="flex shrink-0 items-center gap-10 pr-10" aria-hidden>
       {words.map((word, i) => (
-        <span
-          key={i}
-          className={`font-display text-[56px] sm:text-[72px] md:text-[88px] ${
-            word.outline ? "stroke-text text-ink" : "text-ink"
-          }`}
-        >
-          {word.text}
+        <span key={word} className="flex items-center gap-10">
+          <span
+            className={
+              variant === "a"
+                ? `font-display text-[56px] text-ink sm:text-[76px] md:text-[96px] ${i % 2 ? "stroke-text" : ""}`
+                : "font-display text-[34px] italic text-muted-light sm:text-[44px] md:text-[52px]"
+            }
+          >
+            {word}
+          </span>
+          <span
+            className={`inline-block bg-gradient-to-br from-mist via-lilac to-champagne bg-clip-text text-transparent ${
+              variant === "a" ? "text-[32px] sm:text-[44px]" : "text-[22px]"
+            }`}
+          >
+            ✦
+          </span>
         </span>
       ))}
     </div>
@@ -32,39 +34,47 @@ function Track() {
 }
 
 export default function Marquee() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const xRef = useRef(0);
-  const lastScrollY = useRef(0);
+  const skewRef = useRef<HTMLDivElement>(null);
+  const rowA = useRef<HTMLDivElement>(null);
+  const rowB = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    if (prefersReduced || !trackRef.current) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const a = rowA.current;
+    const b = rowB.current;
+    const skewEl = skewRef.current;
+    if (reduced || !a || !b || !skewEl) return;
 
-    lastScrollY.current = window.scrollY;
-    const baseSpeed = 0.55;
-    let trackWidth = trackRef.current.scrollWidth / 2;
+    let widthA = a.scrollWidth / 2;
+    let widthB = b.scrollWidth / 2;
+    let xA = 0;
+    let xB = -widthB;
+    let skew = 0;
+    let lastY = window.scrollY;
 
     const onResize = () => {
-      if (trackRef.current) trackWidth = trackRef.current.scrollWidth / 2;
+      widthA = a.scrollWidth / 2;
+      widthB = b.scrollWidth / 2;
     };
     window.addEventListener("resize", onResize);
 
     const tick = () => {
-      const currentScrollY = window.scrollY;
-      const velocity = Math.min(
-        Math.abs(currentScrollY - lastScrollY.current) * 0.08,
-        6
-      );
-      lastScrollY.current = currentScrollY;
+      const y = window.scrollY;
+      const velocity = y - lastY;
+      lastY = y;
 
-      xRef.current -= baseSpeed + velocity;
-      if (xRef.current <= -trackWidth) xRef.current += trackWidth;
+      const boost = Math.min(Math.abs(velocity) * 0.14, 9);
+      xA -= 0.6 + boost;
+      xB += 0.45 + boost * 0.8;
+      if (xA <= -widthA) xA += widthA;
+      if (xB >= 0) xB -= widthB;
 
-      if (trackRef.current) {
-        trackRef.current.style.transform = `translateX(${xRef.current}px)`;
-      }
+      const targetSkew = Math.max(-12, Math.min(12, velocity * 0.35));
+      skew += (targetSkew - skew) * 0.12;
+
+      a.style.transform = `translate3d(${xA}px,0,0)`;
+      b.style.transform = `translate3d(${xB}px,0,0)`;
+      skewEl.style.transform = `skewX(${-skew}deg)`;
     };
 
     gsap.ticker.add(tick);
@@ -75,11 +85,24 @@ export default function Marquee() {
   }, []);
 
   return (
-    <div className="overflow-hidden border-y border-ink/10 bg-bone py-8">
-      <div ref={trackRef} className="flex w-max will-change-transform">
-        <Track />
-        <Track />
+    <section
+      data-nav-theme="light"
+      aria-label="What we make"
+      className="relative z-10 -mt-12 overflow-hidden rounded-t-[44px] bg-bone py-12 shadow-[0_-40px_80px_-30px_rgba(8,9,12,0.65)]"
+    >
+      <div ref={skewRef} className="flex flex-col gap-3 will-change-transform">
+        <div ref={rowA} className="flex w-max will-change-transform">
+          <Track words={primary} variant="a" />
+          <Track words={primary} variant="a" />
+        </div>
+        <div ref={rowB} className="flex w-max will-change-transform">
+          <Track words={secondary} variant="b" />
+          <Track words={secondary} variant="b" />
+        </div>
       </div>
-    </div>
+      <span className="sr-only">
+        Management, reels, TikToks, carousels, captions, strategy and community.
+      </span>
+    </section>
   );
 }

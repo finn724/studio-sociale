@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
+import LiquidGlass from "./LiquidGlass";
 
 const posts = Array.from({ length: 8 }, (_, i) => i);
 
@@ -56,11 +57,30 @@ export default function PhoneMockup() {
         style={{
           rotateX: reduced ? 0 : rotateX,
           rotateY: reduced ? 0 : rotateY,
-          transformStyle: "preserve-3d",
         }}
-        className="glass relative mx-auto w-[260px] overflow-hidden rounded-[40px] p-3 sm:w-[280px]"
+        className="relative mx-auto w-[260px] sm:w-[290px]"
       >
-        <div className="overflow-hidden rounded-[28px] bg-midnight">
+        <LiquidGlass
+          radius={46}
+          bezel={22}
+          strength={46}
+          aberration
+          className="overflow-hidden p-3"
+        >
+        <div className="relative overflow-hidden rounded-[34px] bg-midnight">
+          {!reduced && (
+            <motion.span
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 z-10 w-1/2 -skew-x-12"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)",
+              }}
+              initial={{ left: "-60%" }}
+              animate={{ left: ["-60%", "130%"] }}
+              transition={{ duration: 1.6, ease: "easeInOut", repeat: Infinity, repeatDelay: 5 }}
+            />
+          )}
           <div className="flex flex-col gap-3 p-4">
             <div className="flex items-center gap-3">
               <div
@@ -113,6 +133,7 @@ export default function PhoneMockup() {
             </motion.div>
           </div>
         </div>
+        </LiquidGlass>
       </motion.div>
     </div>
   );

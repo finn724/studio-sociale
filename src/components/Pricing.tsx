@@ -1,4 +1,12 @@
-import FadeIn from "./FadeIn";
+"use client";
+
+import { useRef, type ReactNode } from "react";
+import { motion, useReducedMotion, useSpring } from "framer-motion";
+import { EASE } from "@/lib/motion";
+import LiquidBackground from "./LiquidBackground";
+import LiquidGlass from "./LiquidGlass";
+import Magnetic from "./Magnetic";
+import SplitChars from "./SplitChars";
 
 type Tier = {
   name: string;
@@ -23,12 +31,7 @@ const tiers: Tier[] = [
     price: "$XXX",
     period: "/mo",
     description: "Placeholder tier — swap in your real package name, price and inclusions.",
-    features: [
-      "Deliverable one",
-      "Deliverable two",
-      "Deliverable three",
-      "Deliverable four",
-    ],
+    features: ["Deliverable one", "Deliverable two", "Deliverable three", "Deliverable four"],
     featured: true,
   },
   {
@@ -61,80 +64,141 @@ function CheckIcon() {
   );
 }
 
+function Tilt({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  const spring = { stiffness: 160, damping: 18, mass: 0.5 };
+  const rotateX = useSpring(0, spring);
+  const rotateY = useSpring(0, spring);
+
+  function handleMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (reduced || event.pointerType !== "mouse" || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    rotateY.set(px * 10);
+    rotateX.set(-py * 10);
+  }
+
+  function reset() {
+    rotateX.set(0);
+    rotateY.set(0);
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onPointerMove={handleMove}
+      onPointerLeave={reset}
+      style={{ rotateX, rotateY, transformPerspective: 1100 }}
+      className="h-full"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export default function Pricing() {
   return (
-    <section id="pricing" className="bg-bone px-6 py-28 sm:px-10 sm:py-36">
-      <div className="mx-auto max-w-[1400px]">
-        <FadeIn className="mb-16 max-w-xl">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-light">
-            Pricing
-          </p>
-          <h2 className="font-display text-[12vw] sm:text-[56px] md:text-[64px]">
-            Plans for every stage of growth.
-          </h2>
-        </FadeIn>
+    <section
+      id="pricing"
+      data-nav-theme="dark"
+      className="relative overflow-hidden bg-midnight px-6 pb-28 pt-40 text-bone sm:px-10 sm:pb-36 sm:pt-48"
+    >
+      <LiquidBackground intensity={0.9} />
 
-        <div className="grid gap-5 sm:grid-cols-3">
+      <div className="relative z-10 mx-auto max-w-[1400px]">
+        <div className="mb-20 flex flex-col justify-between gap-8 md:flex-row md:items-end">
+          <div className="max-w-2xl">
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: EASE, delay: 0.2 }}
+              className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-bone/50"
+            >
+              Pricing
+            </motion.p>
+            <h1 className="font-display text-[13vw] sm:text-[64px] md:text-[80px]">
+              <SplitChars text="Plans for every stage of growth." inView stagger={0.016} delay={0.2} />
+            </h1>
+          </div>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: EASE, delay: 0.6 }}
+            className="max-w-xs text-sm leading-relaxed text-bone/55"
+          >
+            Not sure which plan fits? Book a call and we&apos;ll help you
+            pick the right one.
+          </motion.p>
+        </div>
+
+        <div className="grid items-stretch gap-6 md:grid-cols-3">
           {tiers.map((tier, i) => (
-            <FadeIn key={`${tier.name}-${i}`} delay={i * 0.08}>
-              <div
-                className="flex h-full flex-col rounded-panel p-8"
-                style={{
-                  background: tier.featured ? "var(--midnight)" : "var(--stone)",
-                  color: tier.featured ? "var(--bone)" : "var(--ink)",
-                }}
-              >
-                {tier.featured && (
-                  <span
-                    className="mb-5 w-fit rounded-full px-3 py-1 text-xs font-medium"
-                    style={{ background: "rgba(159,180,217,0.18)", color: "var(--mist)" }}
-                  >
-                    Most popular
-                  </span>
-                )}
-                <h3 className="font-display text-2xl">{tier.name}</h3>
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="font-display text-4xl">{tier.price}</span>
-                  <span
-                    className="text-sm"
-                    style={{ color: tier.featured ? "rgba(239,236,230,0.5)" : "var(--muted-on-light)" }}
-                  >
-                    {tier.period}
-                  </span>
-                </div>
-                <p
-                  className="mt-4 text-sm leading-relaxed"
-                  style={{ color: tier.featured ? "rgba(239,236,230,0.65)" : "var(--muted-on-light)" }}
+            <motion.div
+              key={`${tier.name}-${i}`}
+              initial={{ opacity: 0, y: 80, rotateX: 14 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              viewport={{ once: true, margin: "-8% 0px" }}
+              transition={{ duration: 1.3, ease: EASE, delay: 0.15 + i * 0.12 }}
+              style={{ transformPerspective: 1200 }}
+              className={tier.featured ? "md:-translate-y-6" : ""}
+            >
+              <Tilt>
+                <LiquidGlass
+                  radius={34}
+                  bezel={24}
+                  strength={56}
+                  blur={tier.featured ? 10 : 6}
+                  tint={tier.featured ? "rgba(239,236,230,0.12)" : "rgba(239,236,230,0.05)"}
+                  className="flex h-full flex-col p-8 sm:p-9"
                 >
-                  {tier.description}
-                </p>
-                <ul className="mt-6 flex flex-col gap-3">
-                  {tier.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-center gap-2.5 text-sm"
-                      style={{ color: tier.featured ? "rgba(239,236,230,0.85)" : "var(--ink)" }}
-                    >
-                      <span style={{ color: "var(--mist)" }}>
-                        <CheckIcon />
+                  {tier.featured && <span aria-hidden className="glow-ring" />}
+
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-display text-2xl">{tier.name}</h2>
+                    {tier.featured && (
+                      <span className="rounded-full bg-bone px-3 py-1 text-xs font-medium text-ink">
+                        Most popular
                       </span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href="#contact"
-                  className="mt-8 flex min-h-11 items-center justify-center rounded-full text-sm font-medium transition-transform hover:scale-[1.02]"
-                  style={{
-                    background: tier.featured ? "var(--bone)" : "var(--ink)",
-                    color: tier.featured ? "var(--ink)" : "var(--bone)",
-                    transitionTimingFunction: "cubic-bezier(.16,1,.3,1)",
-                  }}
-                >
-                  Get started
-                </a>
-              </div>
-            </FadeIn>
+                    )}
+                  </div>
+
+                  <div className="mt-6 flex items-baseline gap-1">
+                    <span className="font-display text-6xl">{tier.price}</span>
+                    <span className="text-sm text-bone/50">{tier.period}</span>
+                  </div>
+
+                  <p className="mt-4 text-sm leading-relaxed text-bone/65">{tier.description}</p>
+
+                  <span aria-hidden className="my-7 h-px w-full bg-gradient-to-r from-bone/0 via-bone/25 to-bone/0" />
+
+                  <ul className="flex flex-1 flex-col gap-3">
+                    {tier.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-3 text-sm text-bone/85">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-mist/20 text-mist">
+                          <CheckIcon />
+                        </span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Magnetic strength={0.15} className="mt-9 w-full">
+                    <a
+                      href="#contact"
+                      className={`flex min-h-12 w-full items-center justify-center rounded-full text-sm font-medium transition-[transform,background] duration-500 hover:scale-[1.02] ${
+                        tier.featured
+                          ? "bg-bone text-ink shadow-[0_10px_40px_-10px_rgba(196,181,240,0.7)]"
+                          : "border border-bone/25 bg-bone/5 text-bone hover:bg-bone/12"
+                      }`}
+                    >
+                      Get started
+                    </a>
+                  </Magnetic>
+                </LiquidGlass>
+              </Tilt>
+            </motion.div>
           ))}
         </div>
       </div>
